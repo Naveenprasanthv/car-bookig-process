@@ -232,7 +232,7 @@ payload map ((item, index)->{
 		</http:request>
 	</flow>
 	<flow name="DeltePartnersById" doc:id="8d29e306-d5aa-4f54-8f96-93fea0fc3773" >
-		<http:request method="DELETE" doc:name="Copy_of_Request" doc:id="3a26af71-6f72-4ba8-a62b-097dcd903f34" config-ref="HTTP_Request_configuration" url="http://car-booking-sys-api-lolkow.us-e2.cloudhub.io/partners/{partnerId}" >
+		<http:request method="DELETE" doc:name="Request" doc:id="3a26af71-6f72-4ba8-a62b-097dcd903f34" config-ref="HTTP_Request_configuration" url="http://car-booking-sys-api-lolkow.us-e2.cloudhub.io/partners/{partnerId}" >
 			<http:uri-params ><![CDATA[#[output application/java
 ---
 {
@@ -285,6 +285,44 @@ payload map ((item, index)->{
 		</choice>
 	</flow>
 	<flow name="postBookings" doc:id="057762e5-2198-46da-a3e1-3d7e45a672ca" >
+		<ee:transform doc:name="Transform Message" doc:id="a788c863-bff5-44a8-be1a-8b46ddc1fc76" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="id" ><![CDATA[{
+	bookingId: payload.bookingId,
+	passenger: payload.passenger,
+	origin: payload.origin,
+	destination: payload.destination
+}
+]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<http:request method="GET" doc:name="Request" doc:id="cd262f47-2274-4b40-a1ed-05c56e84b388" config-ref="HTTP_Request_configuration" url="http://car-booking-sys-api-lolkow.us-e2.cloudhub.io/cars" />
+		<ee:transform doc:name="Transform Message" doc:id="d5899ad1-7df8-4a33-8092-15a34e2720db" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map ((item, index)->{
+    "carId": item.carId,
+    "origin": item.origin,
+    "destination": item.destination,
+    "price": item.price,
+    "carType": item.carType
+}) filter ((item,index)-> item.origin == vars.id.origin and item.destination == vars.id.destination)
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Transform Message" doc:id="6b074072-4411-492a-b883-b34ff1e4b86d" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[{
+	carId: payload[0].carId,
+	bookingId: vars.id.bookingId,
+	passenger: vars.id.passenger
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
 		<ee:transform doc:name="Transform Message" doc:id="e18ceb4b-f56b-42bb-9b67-e5f4984337db" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
@@ -306,16 +344,45 @@ write(payload.carId, "application/json") as String
 	"bookingId" : attributes.uriParams.bookingId
 }]]]></http:uri-params>
 		</http:request>
+		<ee:transform doc:name="Transform Message" doc:id="7f4ab19f-9a18-4565-ae21-ec9e34ae3e32" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="id" ><![CDATA[%dw 2.0
+output application/json
+---
+{
+    "bookingId": payload.bookingId,
+    "passenger": payload.passenger,
+    "carId": payload.carId
+}
+
+]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<http:request method="GET" doc:name="Request" doc:id="81084705-ed48-4bb8-ad1b-50017b6535b7" url="http://car-booking-sys-api-lolkow.us-e2.cloudhub.io/cars/{carId}">
+			<http:uri-params><![CDATA[#[output application/java
+---
+{
+	"carId" : vars.id.carId[0]
+}]]]></http:uri-params>
+		</http:request>
 		<ee:transform doc:name="Transform Message" doc:id="817346a1-0bf0-41f1-a92b-047d63ab149d" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
 ---
-payload map ((item, index)->{
-    "Booking ID": item.bookingId,
-    "Name": item.passenger,
-    "Car ID": item.carId
-}) 
+{
+    "Booking ID": vars.id.bookingId[0],
+    "Name": vars.id.passenger[0],
+    "Booking Details": {
+        "ID": payload[0].carId,
+        "Origin": payload[0].origin,
+        "Destination": payload[0].destination,
+        "Price": payload[0].price,
+        "Type": payload[0].carType
+        }
+        }
 
 ]]></ee:set-payload>
 			</ee:message>
