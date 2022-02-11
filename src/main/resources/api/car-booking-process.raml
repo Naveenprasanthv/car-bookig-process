@@ -1,0 +1,66 @@
+#%RAML 1.0
+title: FlightBooking
+
+mediaType:
+  - application/json
+  - application/xml
+protocols:
+  - HTTPS
+  - HTTP
+
+securitySchemes:
+  clientIDSecret: !include Security/ClientSecurityScheme.raml
+securedBy:
+  - clientIDSecret
+
+documentation:
+  - !include documentation/CarBookingDoc.raml
+
+uses:
+  traitsLib: libraries/TraitsLibrary.raml
+  resTypesLib: libraries/ResourceTypesLibrary.raml
+  dataTypesLib: libraries/DataTypesLibrary.raml
+  
+/partner:
+  type: resTypesLib.collection
+  get:
+  post:
+
+  /{partnersId}:
+    type: resTypesLib.member
+    get:
+    patch:
+    delete:
+        
+/car:
+  type: resTypesLib.collection
+  get:
+    queryParameters:
+      origin?:
+        enum:
+          - Ammapet
+          - Ponnammapet
+          - Saidapet
+          - Shevapet
+      destination?:
+        enum:
+          - Shevapet
+          - Ammapet
+          - Saidapet
+          - Katraj
+  post:
+  /{carsId}:
+    type: resTypesLib.member
+    get:
+    patch:
+    delete:
+
+/booking:
+  type: resTypesLib.collection
+  get:
+  post:
+  /{bookingId}:
+    type: resTypesLib.member
+    get:
+    patch:
+    delete:

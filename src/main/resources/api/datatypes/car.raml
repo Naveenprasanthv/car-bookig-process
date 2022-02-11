@@ -1,0 +1,13 @@
+#%RAML 1.0 DataType
+type: object
+displayName: Flight DataType
+description: Flight Details
+properties:
+  carId?: integer
+  price?: number
+  origin?: string
+  destination?: string
+  carType?: string
+examples:
+  example1: !include ../examples/car1.raml
+  example2: !include ../examples/car2.raml
