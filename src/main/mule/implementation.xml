@@ -88,15 +88,27 @@ payload map ((item, index)->{
 			</otherwise>
 		</choice>
 	</flow>
-	<flow name="postFlights" doc:id="fd4ac471-9464-44b4-aadf-734de95714ce">
-		<http:request method="POST" doc:name="Request" doc:id="18f38925-e3b8-4d6a-b5e6-2c757a99b93e" config-ref="HTTP_Request_configuration" url="http://car-booking-sys-api-lolkow.us-e2.cloudhub.io/cars" />
+	<flow name="postCars" doc:id="fd4ac471-9464-44b4-aadf-734de95714ce">
+		<ee:transform doc:name="Transform Message" doc:id="91d43342-5513-4e31-8e93-313477650b0b" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output text/plain
+---
+write(payload.carId, "application/json") as String ++ "," ++ 
+write (payload.price, "application/json") as String ++ "," ++
+write (payload.origin, "application/json") as String ++ "," ++
+write (payload.destination, "application/json") as String ++ "," ++
+write (payload.carType, "application/json") as String]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<http:request method="POST" doc:name="Request" doc:id="97bfd027-1cb0-47d8-9a2b-a460dec5381d" config-ref="HTTP_Request_configuration" url="http://car-booking-sys-api-lolkow.us-e2.cloudhub.io/cars" />
 	</flow>
 	<flow name="getCarsById" doc:id="a05ade8b-295d-4a27-a546-de03f0f300cf" >
 		<http:request method="GET" doc:name="Request" doc:id="00d505d0-57e6-491a-88a8-c44ff46e41f8" url="http://car-booking-sys-api-lolkow.us-e2.cloudhub.io/cars/{carId}">
 			<http:uri-params ><![CDATA[#[output application/java
 ---
 {
-	"carId" : attributes.uriParams.carId
+	"carId" : attributes.uriParams.carsId
 }]]]></http:uri-params>
 		</http:request>
 		<ee:transform doc:name="Transform Message" doc:id="5495eaa6-574b-4181-b16a-da23402bab09" >
@@ -119,7 +131,7 @@ payload map ((item, index)->{
 			<http:uri-params ><![CDATA[#[output application/java
 ---
 {
-	"carId" : attributes.uriParams.carId
+	"carId" : attributes.uriParams.carsId
 }]]]></http:uri-params>
 		</http:request>
 	</flow>
@@ -128,7 +140,103 @@ payload map ((item, index)->{
 			<http:uri-params ><![CDATA[#[output application/java
 ---
 {
-	"carId" : attributes.uriParams.carId
+	"carId" : attributes.uriParams.carsId
+}]]]></http:uri-params>
+		</http:request>
+	</flow>
+	<flow name="getPartners" doc:id="5c910087-47b0-4d47-b34e-bbbf67ec8faa" >
+		<ee:transform doc:name="Transform Message" doc:id="3b79125c-4700-4b10-869b-4fe88d62f047" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="name" ><![CDATA[attributes.queryParams.partnerName]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<http:request method="GET" doc:name="Request" doc:id="e669ac53-b5ab-4a4b-b823-170e25c0779b" config-ref="HTTP_Request_configuration" url="http://car-booking-sys-api-lolkow.us-e2.cloudhub.io/partners"/>
+		<choice doc:name="Choice" doc:id="3d4ed746-f109-4423-b840-f646c051eb90" >
+			<when expression="#[vars.name != null]">
+				<ee:transform doc:name="Transform Message" doc:id="704373fd-e801-4c88-b6b3-026008f7d8f3" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map ((item, index)->{
+    "ID": item.partnerId,
+    "Name": item.partnerName,
+    "Number of Cars": item.numberOfCars
+}) filter $.Name == vars.name
+]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise >
+				<ee:transform doc:name="Transform Message" doc:id="29075db0-899e-4d28-8923-41aaa8eb93e0">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload map ((item, index)->{
+    "ID": item.partnerId,
+    "Name": item.partnerName,
+    "Number of Cars": item.numberOfCars
+}) 
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+			</otherwise>
+		</choice>
+	</flow>
+	<flow name="postPartners" doc:id="6cad98b6-f061-45de-a072-fc661384f0dc" >
+		<ee:transform doc:name="Transform Message" doc:id="ef5813c8-515e-4116-b8d9-4c7a4235a21a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output text/plain
+---
+write(payload.partnerId, "application/json") as String ++ "," ++  
+write(payload.partnerName, "application/json") as String ++ "," ++
+write(payload.numberOfCars, "application/json") as String
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<http:request method="POST" doc:name="Request" doc:id="bad9b419-e0b0-4ec0-a665-53b7aa04c626" config-ref="HTTP_Request_configuration" url="http://car-booking-sys-api-lolkow.us-e2.cloudhub.io/partners" />
+	</flow>
+	<flow name="getPartnersById" doc:id="5d4044ed-9a07-41b6-bdb0-055fe3273d18" >
+		<http:request method="GET" doc:name="Request" doc:id="5ffa1c48-8716-43ba-8714-6bcc2a2321cb" config-ref="HTTP_Request_configuration" url="http://car-booking-sys-api-lolkow.us-e2.cloudhub.io/partners/{partnerId}" >
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"partnerId" : attributes.uriParams.partnersId
+}]]]></http:uri-params>
+		</http:request>
+		<ee:transform doc:name="Transform Message" doc:id="0dec5fed-6676-4383-a2fa-bc1a8d8cc57d">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload map ((item, index)->{
+    "ID": item.partnerId,
+    "Name": item.partnerName,
+    "Number of Cars": item.numberOfCars
+}) 
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="UpdatePartnersById" doc:id="f2d6e343-0662-4477-88e3-8c15b76c56dd" >
+		<http:request method="PATCH" doc:name="Request" doc:id="a7c5fbf4-afcb-4dfb-8cf1-d65561162a1f" config-ref="HTTP_Request_configuration" url="http://car-booking-sys-api-lolkow.us-e2.cloudhub.io/partners/{partnerId}" >
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"partnerId" : attributes.uriParams.partnersId
+}]]]></http:uri-params>
+		</http:request>
+	</flow>
+	<flow name="DeltePartnersById" doc:id="8d29e306-d5aa-4f54-8f96-93fea0fc3773" >
+		<http:request method="DELETE" doc:name="Copy_of_Request" doc:id="3a26af71-6f72-4ba8-a62b-097dcd903f34" config-ref="HTTP_Request_configuration" url="http://car-booking-sys-api-lolkow.us-e2.cloudhub.io/partners/{partnerId}" >
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"partnerId" : attributes.uriParams.partnersId
 }]]]></http:uri-params>
 		</http:request>
 	</flow>
