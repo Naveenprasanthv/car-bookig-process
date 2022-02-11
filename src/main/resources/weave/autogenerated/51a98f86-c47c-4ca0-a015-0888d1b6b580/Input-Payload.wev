@@ -1,0 +1,10 @@
+%dw 2.0
+
+type auto_51a98f86_c47c_4ca0_a015_0888d1b6b580_Input_Payload = {
+  passenger: String, 
+  bookingId?: Number, 
+  carId?: Number, 
+  _?: Any
+} {"description": "Booking Details",
+"label": "Booking DataType"}
+

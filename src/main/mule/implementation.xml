@@ -240,4 +240,103 @@ payload map ((item, index)->{
 }]]]></http:uri-params>
 		</http:request>
 	</flow>
+	<flow name="getBookings" doc:id="1dc51a4c-877c-4082-9086-52403a96d118" >
+		<ee:transform doc:name="Transform Message" doc:id="390805c9-8906-4d78-85d4-26a3b597ba74" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="name" ><![CDATA[attributes.queryParams.passenger]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<http:request method="GET" doc:name="Request" doc:id="a2473c7a-d22c-41d8-8748-d66eda45c4e8" config-ref="HTTP_Request_configuration" url="http://car-booking-sys-api-lolkow.us-e2.cloudhub.io/booking"/>
+		<choice doc:name="Choice" doc:id="0c68d3cc-99ae-4876-91c4-9218b7fbc839" >
+			<when expression="#[vars.name != null]">
+				<ee:transform doc:name="Transform Message" doc:id="6a4d34ab-e1a0-4f04-829c-d1f9c7381194" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map ((item, index)->{
+    "Booking ID": item.bookingId,
+    "Name": item.passenger,
+    "Car ID": item.carId
+}) filter $.Name == vars.name
+
+]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise >
+				<ee:transform doc:name="Transform Message" doc:id="552ccf28-596a-462e-8a3e-bdaac2b0c7a7">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload map ((item, index)->{
+    "Booking ID": item.bookingId,
+    "Name": item.passenger,
+    "Car ID": item.carId
+}) 
+
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+			</otherwise>
+		</choice>
+	</flow>
+	<flow name="postBookings" doc:id="057762e5-2198-46da-a3e1-3d7e45a672ca" >
+		<ee:transform doc:name="Transform Message" doc:id="e18ceb4b-f56b-42bb-9b67-e5f4984337db" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output text/plain
+---
+write(payload.bookingId, "application/json") as String ++ "," ++  
+write(payload.passenger, "application/json") as String ++ "," ++
+write(payload.carId, "application/json") as String
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<http:request method="POST" doc:name="Request" doc:id="123f2c3d-f603-40b4-b5e2-be620d0fa7d8" config-ref="HTTP_Request_configuration" url="http://car-booking-sys-api-lolkow.us-e2.cloudhub.io/booking" />
+	</flow>
+	<flow name="getBookingsById" doc:id="6a0bf8d6-61f9-4170-bf35-4e1dae16619f" >
+		<http:request method="GET" doc:name="Request" doc:id="506ad16b-137a-4f4b-99ee-10bacf5d5272" config-ref="HTTP_Request_configuration" url="http://car-booking-sys-api-lolkow.us-e2.cloudhub.io/booking/{bookingId}" >
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"bookingId" : attributes.uriParams.bookingId
+}]]]></http:uri-params>
+		</http:request>
+		<ee:transform doc:name="Transform Message" doc:id="817346a1-0bf0-41f1-a92b-047d63ab149d" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map ((item, index)->{
+    "Booking ID": item.bookingId,
+    "Name": item.passenger,
+    "Car ID": item.carId
+}) 
+
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="updateBookingsById" doc:id="51a98f86-c47c-4ca0-a015-0888d1b6b580" >
+		<http:request method="PATCH" doc:name="Request" doc:id="6778fed8-6aa3-4d7b-a305-451f9d2c73a1" config-ref="HTTP_Request_configuration" url="http://car-booking-sys-api-lolkow.us-e2.cloudhub.io/booking/{bookingId}" >
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"bookingId" : attributes.uriParams.bookingId
+}]]]></http:uri-params>
+		</http:request>
+	</flow>
+	<flow name="DeleteBookingsById" doc:id="19124e62-3dcd-4549-84a5-52f68850235b" >
+		<http:request method="DELETE" doc:name="Request" doc:id="1044d6d5-830c-459f-8009-0fff4b86a8a9" config-ref="HTTP_Request_configuration" url="http://car-booking-sys-api-lolkow.us-e2.cloudhub.io/booking/{bookingId}" >
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"bookingId" : attributes.uriParams.bookingId
+}]]]></http:uri-params>
+		</http:request>
+	</flow>
 </mule>

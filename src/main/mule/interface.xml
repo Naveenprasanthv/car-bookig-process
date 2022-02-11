@@ -121,23 +121,7 @@ output application/json
         </error-handler>
     </flow>
     <flow name="delete:\booking\(bookingId):car-booking-process-config">
-        <ee:transform>
-            <ee:variables>
-                <ee:set-variable variableName="bookingId">attributes.uriParams.'bookingId'</ee:set-variable>
-            </ee:variables>
-        </ee:transform>
-        <ee:transform>
-            <ee:message>
-                <ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{
-  code: 404,
-  reasonPhrase: "Not Found",
-  details: "The requested resource is not found"
-}]]></ee:set-payload>
-            </ee:message>
-        </ee:transform>
+        <flow-ref doc:name="Flow Reference" doc:id="924fdc7b-5b0e-4968-b492-9352a7dbd8ea" name="DeleteBookingsById"/>
     </flow>
     <flow name="delete:\car\(carsId):car-booking-process-config">
         <flow-ref doc:name="Flow Reference" doc:id="c5d365d0-29ec-4646-94c2-9f68b496177b" name="DeleteCarsById"/>
@@ -146,23 +130,7 @@ output application/json
         <flow-ref doc:name="Flow Reference" doc:id="5da04218-000e-44e1-a818-df03c47096f4" name="DeltePartnersById"/>
     </flow>
     <flow name="patch:\booking\(bookingId):application\json:car-booking-process-config">
-        <ee:transform>
-            <ee:variables>
-                <ee:set-variable variableName="bookingId">attributes.uriParams.'bookingId'</ee:set-variable>
-            </ee:variables>
-        </ee:transform>
-        <ee:transform>
-            <ee:message>
-                <ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{
-  code: 404,
-  reasonPhrase: "Not Found",
-  details: "The requested resource is not found"
-}]]></ee:set-payload>
-            </ee:message>
-        </ee:transform>
+        <flow-ref doc:name="Flow Reference" doc:id="9d92ae37-a9d8-47ad-a5d0-2ced9d84a405" name="updateBookingsById"/>
     </flow>
     <flow name="patch:\booking\(bookingId):application\xml:car-booking-process-config">
         <ee:transform>
@@ -228,45 +196,10 @@ output application/json
         </ee:transform>
     </flow>
     <flow name="get:\booking:car-booking-process-config">
-        <ee:transform>
-            <ee:message>
-                <ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{
-  code: 404,
-  reasonPhrase: "Not Found",
-  details: "The requested resource is not found"
-}]]></ee:set-payload>
-            </ee:message>
-        </ee:transform>
+        <flow-ref doc:name="Flow Reference" doc:id="2f58cbc6-e1d6-49df-bf9b-28538ad1e633" name="getBookings"/>
     </flow>
     <flow name="get:\booking\(bookingId):car-booking-process-config">
-        <ee:transform>
-            <ee:variables>
-                <ee:set-variable variableName="bookingId">attributes.uriParams.'bookingId'</ee:set-variable>
-            </ee:variables>
-        </ee:transform>
-        <ee:transform>
-            <ee:message>
-                <ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{
-  cardetails: {
-    value: {
-      carId: 1,
-      price: 400.0,
-      origin: "Ammapet",
-      destination: "Sevvapet",
-      carType: "SUV"
-    }
-  },
-  bookingId: 123,
-  passenger: "Kowshalya"
-}]]></ee:set-payload>
-            </ee:message>
-        </ee:transform>
+        <flow-ref doc:name="Flow Reference" doc:id="d3a49192-86a7-435d-8bae-5408bf19cfe3" name="getBookingsById"/>
     </flow>
     <flow name="get:\car:car-booking-process-config">
         <flow-ref doc:name="Flow Reference" doc:id="269d6f3e-384f-490d-b133-fb97dee8c98a" name="GetCars"/>
@@ -281,18 +214,7 @@ output application/json
         <flow-ref doc:name="Flow Reference" doc:id="8a8f60b5-af56-4292-8d83-431b0a1ed817" name="getPartnersById"/>
     </flow>
     <flow name="post:\booking:application\json:car-booking-process-config">
-        <ee:transform>
-            <ee:message>
-                <ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{
-  code: 404,
-  reasonPhrase: "Not Found",
-  details: "The requested resource is not found"
-}]]></ee:set-payload>
-            </ee:message>
-        </ee:transform>
+        <flow-ref doc:name="Flow Reference" doc:id="17844e3f-4067-40fe-90a4-0430082fc097" name="postBookings"/>
     </flow>
     <flow name="post:\booking:application\xml:car-booking-process-config">
         <ee:transform>
