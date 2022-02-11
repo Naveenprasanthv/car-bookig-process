@@ -1,11 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
-	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
 	<flow name="GetCars" doc:id="e80a6f84-29cd-4992-a563-8e5b5f482dcf" >
-		<http:request method="GET" doc:name="Request" doc:id="ac7cc571-5318-462b-9f50-a6b8f42a3783" config-ref="HTTP_Request_configuration" path="/cars"/>
-		<set-payload value="#[payload]" doc:name="Set Payload" doc:id="d0e47a26-7704-49a9-843f-ba5e644b4e48" />
+		<http:request method="GET" doc:name="Request" doc:id="ac7cc571-5318-462b-9f50-a6b8f42a3783" config-ref="HTTP_Request_configuration" url="https://flight-booking-sys-api-lolkow.us-e2.cloudhub.io/api/cars"/>
+		<ee:transform doc:name="Transform Message" doc:id="c5798a89-f368-4f2f-858e-3c4f66e3c2ae" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="getCarsById" doc:id="a05ade8b-295d-4a27-a546-de03f0f300cf" >
+		<http:request method="GET" doc:name="Request" doc:id="00d505d0-57e6-491a-88a8-c44ff46e41f8" url="https://flight-booking-sys-api-lolkow.us-e2.cloudhub.io/api/cars/{carId}">
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"carId" : attributes.uriParams.carId
+}]]]></http:uri-params>
+		</http:request>
 	</flow>
 </mule>
