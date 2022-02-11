@@ -140,23 +140,7 @@ output application/json
         </ee:transform>
     </flow>
     <flow name="delete:\car\(carsId):car-booking-process-config">
-        <ee:transform>
-            <ee:variables>
-                <ee:set-variable variableName="carsId">attributes.uriParams.'carsId'</ee:set-variable>
-            </ee:variables>
-        </ee:transform>
-        <ee:transform>
-            <ee:message>
-                <ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{
-  code: 404,
-  reasonPhrase: "Not Found",
-  details: "The requested resource is not found"
-}]]></ee:set-payload>
-            </ee:message>
-        </ee:transform>
+        <flow-ref doc:name="Flow Reference" doc:id="c5d365d0-29ec-4646-94c2-9f68b496177b" name="DeleteCarsById"/>
     </flow>
     <flow name="delete:\partner\(partnersId):car-booking-process-config">
         <ee:transform>
@@ -216,23 +200,7 @@ output application/json
         </ee:transform>
     </flow>
     <flow name="patch:\car\(carsId):application\json:car-booking-process-config">
-        <ee:transform>
-            <ee:variables>
-                <ee:set-variable variableName="carsId">attributes.uriParams.'carsId'</ee:set-variable>
-            </ee:variables>
-        </ee:transform>
-        <ee:transform>
-            <ee:message>
-                <ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{
-  code: 404,
-  reasonPhrase: "Not Found",
-  details: "The requested resource is not found"
-}]]></ee:set-payload>
-            </ee:message>
-        </ee:transform>
+        <flow-ref doc:name="Flow Reference" doc:id="e45bd99b-ed23-406b-a889-5b7c0b785402" name="UpdateCarsById"/>
     </flow>
     <flow name="patch:\car\(carsId):application\xml:car-booking-process-config">
         <ee:transform>

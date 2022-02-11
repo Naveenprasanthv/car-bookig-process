@@ -1,0 +1,12 @@
+%dw 2.0
+
+type auto_655224fa_286a_4f8b_9d56_171a594fd7b1_Input_Payload = {
+  carType?: String, 
+  price?: Number, 
+  origin?: String, 
+  destination?: String, 
+  carId?: Number, 
+  _?: Any
+} {"description": "Flight Details",
+"label": "Flight DataType"}
+

@@ -1,0 +1,23 @@
+%dw 2.0
+
+type auto_655224fa_286a_4f8b_9d56_171a594fd7b1_Input_Attributes = {|
+  clientCertificate?: {|
+    publicKey?: {|  |}, 
+    "type"?: String, 
+    encoded?: Binary
+  |}, 
+  headers: {| Accept?: String |}, 
+  listenerPath: String, 
+  method: String, 
+  queryParams: {|  |}, 
+  queryString: String, 
+  relativePath: String, 
+  remoteAddress: String, 
+  requestPath: String, 
+  requestUri: String, 
+  scheme: String, 
+  uriParams: {| carsId: String |}, 
+  version: String, 
+  localAddress: String
+|}
+
