@@ -314,18 +314,33 @@ payload map ((item, index)->{
 ]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
-		<ee:transform doc:name="Transform Message" doc:id="6b074072-4411-492a-b883-b34ff1e4b86d" >
-			<ee:message >
-				<ee:set-payload ><![CDATA[{
+		<choice doc:name="Choice" doc:id="258bc6d5-cfe2-4f4b-b1c0-da2b78bdd4c2" >
+			<when expression='#[payload[0].carId == "null"]'>
+				<ee:transform doc:name="Transform Message" doc:id="83ba60d1-9842-49e4-abca-295f55c4951a" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	Message: "OOPS, it seems car services are not available from " ++ vars.id.origin as String ++
+	" to" ++ vars.id.destination as String
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise >
+				<ee:transform doc:name="Transform Message" doc:id="6b074072-4411-492a-b883-b34ff1e4b86d">
+			<ee:message>
+				<ee:set-payload><![CDATA[{
 	carId: payload[0].carId,
 	bookingId: vars.id.bookingId,
 	passenger: vars.id.passenger
 }]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
-		<ee:transform doc:name="Transform Message" doc:id="e18ceb4b-f56b-42bb-9b67-e5f4984337db" >
-			<ee:message >
-				<ee:set-payload ><![CDATA[%dw 2.0
+				<ee:transform doc:name="Transform Message" doc:id="e18ceb4b-f56b-42bb-9b67-e5f4984337db">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
 output text/plain
 ---
 write(payload.bookingId, "application/json") as String ++ "," ++  
@@ -334,7 +349,9 @@ write(payload.carId, "application/json") as String
 ]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
-		<http:request method="POST" doc:name="Request" doc:id="123f2c3d-f603-40b4-b5e2-be620d0fa7d8" config-ref="HTTP_Request_configuration" url="http://car-booking-sys-api-lolkow.us-e2.cloudhub.io/booking" />
+				<http:request method="POST" doc:name="Request" doc:id="123f2c3d-f603-40b4-b5e2-be620d0fa7d8" config-ref="HTTP_Request_configuration" url="http://car-booking-sys-api-lolkow.us-e2.cloudhub.io/booking" />
+			</otherwise>
+		</choice>
 	</flow>
 	<flow name="getBookingsById" doc:id="6a0bf8d6-61f9-4170-bf35-4e1dae16619f" >
 		<http:request method="GET" doc:name="Request" doc:id="506ad16b-137a-4f4b-99ee-10bacf5d5272" config-ref="HTTP_Request_configuration" url="http://car-booking-sys-api-lolkow.us-e2.cloudhub.io/booking/{bookingId}" >
