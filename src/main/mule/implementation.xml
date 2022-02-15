@@ -369,41 +369,57 @@ write(payload.carId, "application/json") as String
 output application/json
 ---
 {
-    "bookingId": payload.bookingId,
-    "passenger": payload.passenger,
-    "carId": payload.carId
+    "bookingId": payload[0].bookingId,
+    "passenger": payload[0].passenger,
+    "carId": payload[0].carId
 }
 
 ]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
-		<http:request method="GET" doc:name="Request" doc:id="81084705-ed48-4bb8-ad1b-50017b6535b7" url="http://car-booking-sys-api-lolkow.us-e2.cloudhub.io/cars/{carId}">
-			<http:uri-params><![CDATA[#[output application/java
----
-{
-	"carId" : vars.id.carId[0]
-}]]]></http:uri-params>
-		</http:request>
-		<ee:transform doc:name="Transform Message" doc:id="817346a1-0bf0-41f1-a92b-047d63ab149d" >
-			<ee:message >
-				<ee:set-payload ><![CDATA[%dw 2.0
+		<choice doc:name="Choice" doc:id="dac7ee3f-0e81-43d6-a36b-e66b70c28569" >
+			<when expression="#[vars.id.bookingId == null]">
+				<ee:transform doc:name="Transform Message" doc:id="4602a8eb-2514-4d67-936a-3d6960cb6ea1" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
 ---
 {
-    "Booking ID": vars.id.bookingId[0],
-    "Name": vars.id.passenger[0],
+	Message: "There are no details for this Booking ID."
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise >
+				<http:request method="GET" doc:name="Request" doc:id="81084705-ed48-4bb8-ad1b-50017b6535b7" url="http://car-booking-sys-api-lolkow.us-e2.cloudhub.io/cars/{carId}">
+			<http:uri-params><![CDATA[#[output application/java
+---
+{
+	"carId" : vars.id.carId
+}]]]></http:uri-params>
+		</http:request>
+				<ee:transform doc:name="Transform Message" doc:id="817346a1-0bf0-41f1-a92b-047d63ab149d">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
     "Booking Details": {
         "ID": payload[0].carId,
         "Origin": payload[0].origin,
         "Destination": payload[0].destination,
         "Price": payload[0].price,
         "Type": payload[0].carType
-        }
+        },
+         "Booking ID": vars.id.bookingId,
+    	 "Name": vars.id.passenger,
         }
 
 ]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
+			</otherwise>
+		</choice>
 	</flow>
 	<flow name="updateBookingsById" doc:id="51a98f86-c47c-4ca0-a015-0888d1b6b580" >
 		<http:request method="PATCH" doc:name="Request" doc:id="6778fed8-6aa3-4d7b-a305-451f9d2c73a1" config-ref="HTTP_Request_configuration" url="http://car-booking-sys-api-lolkow.us-e2.cloudhub.io/booking/{bookingId}" >
